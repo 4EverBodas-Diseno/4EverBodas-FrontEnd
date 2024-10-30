@@ -1,8 +1,9 @@
 import React, { useContext, useEffect, useState } from "react";
 import { ClipboardIcon, ShareIcon } from "@heroicons/react/24/outline";
 import RealTime from "./RealTime";
-import fetchingByUserID from "../../utils/fetching";
+import { fetchingByUserID } from "../../utils/fetching";
 import AuthContext from "../../context/AuthContext";
+import { copyToClipboard } from "../../utils/extra";
 const Principal = () => {
   const { auth } = useContext(AuthContext);
   const [data, setData] = useState(null);
@@ -11,7 +12,6 @@ const Principal = () => {
       try {
         const webPage = await fetchingByUserID(auth.UserID);
         setData(webPage);
-        console.log(webPage);
       } catch (error) {
         console.error("Error fetching data:", error);
       }
@@ -44,19 +44,6 @@ const Principal = () => {
       {data && <RealTime data={data} setData={setData} />}
     </>
   );
-};
-
-const copyToClipboard = (text) => {
-  navigator.clipboard
-    .writeText(text)
-    .then(() => {
-      console.log("Texto copiado al portapapeles:", text);
-      alert("Texto copiado al portapapeles"); // Mensaje de éxito (puedes personalizarlo)
-    })
-    .catch((err) => {
-      console.error("Error al copiar el texto:", err);
-      alert("Error al copiar el texto");
-    });
 };
 
 export default Principal;

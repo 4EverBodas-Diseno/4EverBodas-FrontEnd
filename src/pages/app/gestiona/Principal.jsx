@@ -1,38 +1,67 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import Table from "./Table";
 import { uid } from "uid";
+
 const Principal = () => {
   const [active, setActive] = useState(false);
   const [guests, setGuests] = useState([]);
+  const [count, setCount] = useState(0);
+  const [selectedGuestIds, setSelectedGuestIds] = useState(new Set());
+
+  const handleSelect = useCallback((guestId) => {
+    setSelectedGuestIds((prevSelectedGuestIds) => {
+      const newSelectedGuestIds = new Set(prevSelectedGuestIds);
+      if (newSelectedGuestIds.has(guestId)) {
+        newSelectedGuestIds.delete(guestId);
+        setCount((prev) => prev - 1);
+      } else {
+        newSelectedGuestIds.add(guestId);
+        setCount((prev) => prev + 1);
+      }
+      return newSelectedGuestIds;
+    });
+  }, []);
+  const isGuestSelected = useCallback(
+    (guestId) => selectedGuestIds.has(guestId),
+    [selectedGuestIds]
+  );
 
   const [newGuest, setNewGuest] = useState({
     nombres: "",
+    apellidos: "",
     telefono: "",
     maxAcompanantes: 0,
     correo: "",
   });
 
+  const handleSeleccionarTodos = () => {
+    guests.forEach((e) => {
+      handleSelect(e.GuestID);
+    });
+  };
   const handleSubmit = (e) => {
     e.preventDefault();
-    //obtener el userID del localstorage
     const auth = JSON.parse(localStorage.getItem("auth"));
+    const guestInfo = JSON.stringify({
+      GuestID: uid(),
+      UserID: auth.UserID,
+      Nombre: newGuest.nombres,
+      Apellido: newGuest.apellidos,
+      Correo: newGuest.correo,
+      EstadoInvitacion: "Por confirmar",
+      Confirmado: true,
+      numAcompanantes: 10,
+      numMaxAcompanantes: newGuest.maxAcompanantes,
+      Telefono: newGuest.telefono,
+      URL: "holamundo",
+    });
+    //obtener el userID del localstorage
     fetch(import.meta.env.VITE_API_ENDPOINT + "/guests", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({
-        GuestID: uid(),
-        UserID: auth.UserID,
-        Nombre: newGuest.nombres,
-        Correo: newGuest.correo,
-        EstadoInvitacion: "string",
-        Confirmado: true,
-        numAcompanantes: 10,
-        numMaxAcompanantes: newGuest.maxAcompanantes,
-        Telefono: newGuest.telefono,
-        URL: "holamundo",
-      }),
+      body: guestInfo,
     })
       .then((response) => {
         if (response.ok) {
@@ -41,11 +70,46 @@ const Principal = () => {
         throw new Error("Error en la petición");
       })
       .then((data) => {
-        setGuests([...guests, newGuest]);
+        console.log(data);
+        setGuests([...guests, data.guest]);
         console.log("Invitado agregado");
+        setNewGuest({
+          nombres: "",
+          apellidos: "",
+          telefono: "",
+          maxAcompanantes: 0,
+          correo: "",
+        });
+        setActive(false);
       });
   };
 
+  const handleEliminar = () => {
+    if (selectedGuestIds.size === 0) return alert("No ha seleccionado");
+    const arreglo = Array.from(selectedGuestIds);
+    const Json = JSON.stringify({
+      ids: arreglo,
+    });
+    fetch(import.meta.env.VITE_API_ENDPOINT + "/guests/delete", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: Json,
+    })
+      .then((response) => {
+        if (response.ok) return response.json();
+        throw new Error("Error en la petición");
+      })
+      .then((data) => {
+        alert(data.message);
+      });
+
+    setGuests((prevGuests) =>
+      prevGuests.filter((guest) => !selectedGuestIds.has(guest.GuestID))
+    );
+    setSelectedGuestIds(new Set());
+  };
   useEffect(() => {
     //traer el auth desde el localstorage
     const auth = JSON.parse(localStorage.getItem("auth"));
@@ -84,17 +148,24 @@ const Principal = () => {
             >
               Agregar invitado
             </button>
-            <button className="text-red-500 font-semibold hover:underline">
+            <button
+              onClick={handleEliminar}
+              className="text-red-500 font-semibold hover:underline"
+            >
               Eliminar
             </button>
-            <button className="text-yellow-500 font-semibold hover:underline">
+
+            <button
+              className="text-yellow-500 font-semibold hover:underline"
+              disabled={count > 1}
+            >
               Editar
             </button>
           </section>
-          <select className="border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-gray-300">
+          {/* <select className="border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-gray-300">
             <option value="todos">Todos</option>
-            {/* Otras opciones */}
-          </select>
+            
+          </select> */}
         </div>
         {active && (
           //form to add a new guest
@@ -110,15 +181,34 @@ const Principal = () => {
                 htmlFor="nombres"
                 className="block text-gray-700 font-semibold mb-1"
               >
-                Nombres y Apellidos:
+                Nombres:
               </label>
               <input
                 type="text"
-                id="nombres"
-                name="nombres"
+                id="Nombre"
+                name="Nombre"
                 value={newGuest.nombres}
                 onChange={(e) =>
                   setNewGuest({ ...newGuest, nombres: e.target.value })
+                }
+                required
+                className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-gray-300"
+              />
+            </div>
+            <div>
+              <label
+                htmlFor="apellidos"
+                className="block text-gray-700 font-semibold mb-1"
+              >
+                Apellidos:
+              </label>
+              <input
+                type="text"
+                id="Apellidos"
+                name="Apellidos"
+                value={newGuest.apellidos}
+                onChange={(e) =>
+                  setNewGuest({ ...newGuest, apellidos: e.target.value })
                 }
                 required
                 className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-gray-300"
@@ -196,18 +286,28 @@ const Principal = () => {
         {/* Sección derecha */}
         <div className="flex items-center space-x-4 justify-between">
           <div className="flex items-center">
-            <input type="checkbox" className="mr-2" />
+            <input
+              type="checkbox"
+              className="mr-2"
+              onChange={handleSeleccionarTodos}
+              checked={count === guests.length}
+            />
             <span className="text-gray-600">Seleccionar todos</span>
             <span className="mx-2">|</span>
-            <span className="text-gray-600">0 personas seleccionadas</span>
+            <span className="text-gray-600">
+              {count} personas seleccionadas
+            </span>
           </div>
-
-          <button className="border border-green-500 text-green-500 px-4 py-2 rounded-full font-semibold hover:bg-green-100">
-            Enviar por WhatsApp
-          </button>
         </div>
       </div>
-      <Table guests={guests} />
+
+      {guests && (
+        <Table
+          guests={guests}
+          isGuestSelected={isGuestSelected}
+          handleSelect={handleSelect}
+        />
+      )}
       {/* <div className="w-full flex justify-between mt-4 py-3 px-6 border-[1px] border-slate-200 rounded-xl">
         <section>
           <p>

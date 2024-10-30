@@ -13,33 +13,33 @@ const renderColors = (item) => {
 const colores = [
   {
     id: 1,
-    primary: "#FF0000",
-    secondary: "#C10000",
+    primary: "#ff69a7",
+    secondary: "#b6f679",
   },
   {
     id: 2,
-    primary: "#00FF00",
-    secondary: "#95ff95",
+    primary: "#51c778",
+    secondary: "#919edc",
   },
   {
     id: 3,
-    primary: "#0000FF",
-    secondary: "#6565ef",
+    primary: "#613bdd",
+    secondary: "#ea88c5",
   },
   {
     id: 4,
-    primary: "#FFFF00",
-    secondary: "#d7d76f",
+    primary: "#fd125a",
+    secondary: "#a6fe6f",
   },
   {
     id: 5,
-    primary: "#FF00FF",
-    secondary: "#ed63ed",
+    primary: "#0a49fd",
+    secondary: "#fe71c9",
   },
   {
     id: 6,
-    primary: "#00FFFF",
-    secondary: "#63dfdf",
+    primary: "#c8dd2c",
+    secondary: "#84cfeb",
   },
 ];
 const tipografias = [

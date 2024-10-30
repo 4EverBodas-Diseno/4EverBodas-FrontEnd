@@ -15,20 +15,28 @@ const Date = ({ fecha, nombrePareja, colores }) => {
       </h2>
       <div className="flex justify-center space-x-4 text-center mb-6">
         <div>
-          <p className="text-5xl font-bold">
+          <p className="text-5xl font-bold" style={{ color: colores.primary }}>
             {CalcularDiferencia(fecha).meses}
           </p>
-          <p className="text-lg">meses</p>
+          <p className="text-lg" style={{ color: colores.primary }}>
+            meses
+          </p>
         </div>
         <div>
-          <p className="text-5xl font-bold">
+          <p className="text-5xl font-bold" style={{ color: colores.primary }}>
             {CalcularDiferencia(fecha).semanas}
           </p>
-          <p className="text-lg">semanas</p>
+          <p className="text-lg" style={{ color: colores.primary }}>
+            semanas
+          </p>
         </div>
         <div>
-          <p className="text-5xl font-bold">{CalcularDiferencia(fecha).dias}</p>
-          <p className="text-lg">días</p>
+          <p className="text-5xl font-bold" style={{ color: colores.primary }}>
+            {CalcularDiferencia(fecha).dias}
+          </p>
+          <p className="text-lg" style={{ color: colores.primary }}>
+            días
+          </p>
         </div>
       </div>
       <p className="text-gray-600 mb-4">

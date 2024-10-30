@@ -45,6 +45,7 @@ const Principal = () => {
       .then((res) => res.json())
       .then((data) => {
         console.log(data);
+        alert("Se ha guardado correctamente");
       })
       .catch((error) => {
         console.error("Error:", error);
@@ -74,7 +75,7 @@ const Principal = () => {
               placeholder="Ale y Uziel"
               value={nombrePareja}
               onChange={(e) => setNombrePareja(e.target.value)}
-              className="px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-pink-500"
+              className="px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-primary-100"
             />
           </div>
           <span className="text-gray-500 ml-2">
@@ -93,7 +94,7 @@ const Principal = () => {
             id="fecha-boda"
             value={fechaBoda}
             onChange={(e) => setFechaBoda(e.target.value)}
-            className="ww- px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-pink-500"
+            className="ww- px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-primary-100"
           />
         </div>
         <div className="mb-6">
@@ -110,13 +111,13 @@ const Principal = () => {
               placeholder="Insertar URL de Google Maps"
               value={ubicacionEvento}
               onChange={(e) => setUbicacionEvento(e.target.value)}
-              className="w-96 px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-pink-500"
+              className="w-96 px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-primary-100"
             />
           </section>
           <a
             href="https://www.google.com/maps"
             target="_blank"
-            className="text-pink-500 mt-2 inline-block"
+            className="text-primary-100 mt-2 inline-block"
           >
             ¿Necesitas ayuda para obtener la URL?
           </a>
@@ -132,7 +133,7 @@ const Principal = () => {
             id="historia"
             rows="4"
             placeholder="Escribe aquí tu linda historia de amor..."
-            className="w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-pink-500"
+            className="w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-primary-100"
             value={historia}
             onChange={(e) => setHistoria(e.target.value)}
           ></textarea>
@@ -140,7 +141,7 @@ const Principal = () => {
         <div className="text-center">
           <button
             type="submit"
-            className="bg-pink-500 text-white px-6 py-3 rounded-full font-semibold hover:bg-pink-600 focus:outline-none focus:ring-2 focus:ring-pink-500"
+            className="bg-primary-100 text-white px-6 py-3 rounded-full font-semibold hover:bg-primary-100 focus:outline-none focus:ring-2 focus:ring-primary-100"
           >
             Guardar
           </button>

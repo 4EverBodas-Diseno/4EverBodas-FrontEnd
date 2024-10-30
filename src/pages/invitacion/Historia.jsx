@@ -13,14 +13,9 @@ const Historia = ({ description, colores }) => {
         >
           Nuestra historia
         </h2>
-        <section>
-          <span></span>
-          <span></span>
-          <span></span>
-        </section>
         <p className="mt-5">
           {description === "" ? (
-            <Link to={"/mi-boda"} style={{ color: colores.primary }}>
+            <Link to={"/mi-boda"} className="font-semibold text-sm underline">
               Escribe una emocionante historia dando click aquí...
             </Link>
           ) : (

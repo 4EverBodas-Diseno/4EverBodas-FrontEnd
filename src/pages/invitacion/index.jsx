@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import Principal from "./Principal";
-import fetchingByUserID from "../../utils/fetching";
+import { fetchingByUserID } from "../../utils/fetching";
 import { useParams } from "react-router-dom";
 
 const Index = () => {

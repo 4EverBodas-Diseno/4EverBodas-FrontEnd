@@ -1,4 +1,4 @@
-const fetchingByUserID = async (UserID) => {
+export const fetchingByUserID = async (UserID) => {
   let idWedding = "";
   const webPage = {};
 
@@ -56,4 +56,22 @@ const fetchingByUserID = async (UserID) => {
   return webPage;
 };
 
-export default fetchingByUserID;
+export const fetchingByGuestID = async (GuestID) => {
+  try {
+    const resGuest = await fetch(
+      import.meta.env.VITE_API_ENDPOINT + "/guests/" + GuestID,
+      {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      }
+    );
+    if (resGuest.ok) {
+      const dataGuest = await resGuest.json();
+      return dataGuest;
+    }
+  } catch (error) {
+    console.error("Error:", error);
+  }
+};
