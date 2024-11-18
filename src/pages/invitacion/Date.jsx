@@ -6,7 +6,7 @@ import {
 } from "../../utils/formats";
 const Date = ({ fecha, nombrePareja, colores }) => {
   return (
-    <div className="bg-white rounded-lg p-8 text-center">
+    <div id="Fecha" className="bg-white rounded-lg p-8 text-center">
       <h2
         className="text-2xl font-bold mb-4"
         style={{ color: colores.secondary }}

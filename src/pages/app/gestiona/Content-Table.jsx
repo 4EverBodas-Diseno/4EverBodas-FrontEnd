@@ -6,11 +6,11 @@ const Styles = (text) => {
   if (text === "Por confirmar") {
     return "bg-gray-200 text-gray-600";
   }
-  if (text === "Confirmado") {
+  if (text === "Asistirá") {
     return "bg-green-200 text-green-600";
   }
 
-  if (text === "Rechazado") {
+  if (text === "No Asistirá") {
     return "bg-red-200 text-red-600";
   }
 };
@@ -31,7 +31,10 @@ const ContentTable = memo(({ guest, isSelected, onSelect }) => {
         {guest.Nombre} {guest.Apellido}
       </td>
       <td className="px-4 py-2">{guest.Telefono}</td>
-      <td className="px-4 py-2">{guest.numAcompanantes}</td>
+      <td className="px-4 py-2">
+        {guest.numAcompanantes}/{guest.numMaxAcompanantes}
+        <span className="text-xs">max</span>
+      </td>
       <td className="px-4 py-2">
         <span
           className={`${Styles(

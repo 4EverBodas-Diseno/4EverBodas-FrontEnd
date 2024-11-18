@@ -20,7 +20,7 @@ const Principal = ({ webPage }) => {
           fecha={webPage.fecha}
           nombrePareja={webPage.nombrePareja}
         />
-        <Lugar colores={webPage.color} url={webPage.URLLugar} />
+        <Lugar id="Lugar" colores={webPage.color} url={webPage.URLLugar} />
       </div>
     </div>
   );

@@ -4,9 +4,11 @@ import RealTime from "./RealTime";
 import { fetchingByUserID } from "../../utils/fetching";
 import AuthContext from "../../context/AuthContext";
 import { copyToClipboard } from "../../utils/extra";
+import PopUpSocialMedia from "../../components/PopUpSocialMedia";
 const Principal = () => {
   const { auth } = useContext(AuthContext);
   const [data, setData] = useState(null);
+  const [active, setActive] = useState(false);
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -19,7 +21,7 @@ const Principal = () => {
 
     fetchData(); // Llamamos a la función asíncrona
   }, []);
-  return (
+  return data ? (
     <>
       <h1 className="text-3xl font-bold text-secondary-200">
         Bienvenidos, {data?.nombrePareja}
@@ -39,10 +41,23 @@ const Principal = () => {
           }
           className="h-6 w-6 text-primary-100 cursor-pointer"
         />
-        <ShareIcon className="h-6 w-6 text-primary-100" />
+        <ShareIcon
+          onClick={() => setActive(true)}
+          className="h-6 w-6 text-primary-100"
+        />
       </section>
       {data && <RealTime data={data} setData={setData} />}
+      {active && (
+        <PopUpSocialMedia
+          onClose={() => setActive(false)}
+          shareLink={`${import.meta.env.VITE_URL_FRONTEND}/invitacion/${
+            auth.UserID
+          }`}
+        />
+      )}
     </>
+  ) : (
+    <p>Cargando...</p>
   );
 };
 

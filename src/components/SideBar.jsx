@@ -72,12 +72,12 @@ const SideBar = () => {
               <p>Perfil</p>
             </Link>
           </li>
-          <li>
+          {/* <li>
             <Link to="/ayuda" className="flex items-center px-4 py-3 gap-5">
               <Cog6ToothIcon className="size-5" />
               <p>¿Necesitas ayuda?</p>
             </Link>
-          </li>
+          </li> */}
           <li className="w-full ">
             <SignOut />
           </li>

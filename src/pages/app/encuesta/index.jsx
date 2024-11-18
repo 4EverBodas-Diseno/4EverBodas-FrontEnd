@@ -12,114 +12,110 @@ const Encuesta = () => {
   const [fechaBoda, setFechaBoda] = useState("");
   const [ubicacionEvento, setUbicacionEvento] = useState("");
 
-  function handleSubmit(e) {
+  async function handleSubmit(e) {
     e.preventDefault();
     //validar que todos estén llenos
+    // Validar que todos los campos estén llenos
     if (nombrePareja === "" || fechaBoda === "" || ubicacionEvento === "") {
       alert("Todos los campos son obligatorios");
       return;
     }
-    const WeddingID = uid();
-    let convertirNombrePareja = FormatearPareja(nombrePareja);
-    const URL =
-      import.meta.env.VITE_URL_FRONTEND +
-      convertirNombrePareja +
-      "/" +
-      fechaBoda;
-    //extrar auth.UserID del local storage
-    const auth = JSON.parse(localStorage.getItem("auth"));
 
-    console.log("Ejecutando weddings");
-    fetch(import.meta.env.VITE_API_ENDPOINT + "/weddings", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        WeddingID,
-        UserID: auth.UserID,
-        NombrePareja: nombrePareja,
-        FechaEvento: fechaBoda,
-        Lugar: ubicacionEvento,
-        Historia: "",
-      }),
-    })
-      .then((res) => {
-        if (res.ok) {
-          alert("Encuesta enviada con éxito");
-        } else {
-          alert("Error al enviar la encuesta");
+    try {
+      const WeddingID = uid();
+      let convertirNombrePareja = FormatearPareja(nombrePareja);
+      const URL =
+        import.meta.env.VITE_URL_FRONTEND +
+        convertirNombrePareja +
+        "/" +
+        fechaBoda;
+
+      const auth = JSON.parse(localStorage.getItem("auth"));
+
+      console.log("Ejecutando weddings");
+      const weddingResponse = await fetch(
+        import.meta.env.VITE_API_ENDPOINT + "/weddings",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            WeddingID,
+            UserID: auth.UserID,
+            NombrePareja: nombrePareja,
+            FechaEvento: fechaBoda,
+            Lugar: ubicacionEvento,
+            Historia: "",
+          }),
         }
-      })
-      .then((data) => {
-        console.log(data);
-      })
-      .catch((error) => {
-        console.error("Error:", error);
-      });
+      );
 
-    console.log("actualizando user");
-    fetch(
-      import.meta.env.VITE_API_ENDPOINT +
-        "/users/" +
-        auth.UserID +
-        "/completed",
-      {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-        },
+      if (weddingResponse.ok) {
+        console.log("Encuesta enviada con éxito");
+      } else {
+        console.error("Error al enviar la encuesta");
+        return; // Salir si ocurre un error
       }
-    )
-      .then((res) => {
-        if (res.ok) {
-          //actualizar el estado de auth en el contexto con Completado = true
-          alert("Good al actualizar el user");
-        } else {
-          alert("Error al actualizar el user");
-        }
-      })
-      .then((data) => {
-        console.log(data);
-      })
-      .catch((error) => {
-        console.error("Error:", error);
-      });
 
-    console.log("Ejecutando webpages");
-    fetch(import.meta.env.VITE_API_ENDPOINT + "/webpages", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        WebPageID: uid(),
-        WeddingID,
-        URLPage: URL,
-        Styles: {
-          primaryColor: "#FFD700",
-          secondaryColor: "#FFD700",
-          Typography: "Roboto",
-          FrontURL:
-            "https://fonts.googleapis.com/css2?family=Roboto:wght@300&display=swap",
-        },
-      }),
-    })
-      .then((res) => {
-        if (res.ok) {
-          alert("Creado web page");
-        } else {
-          alert("Error al crear web page");
+      console.log("Actualizando user");
+      const userResponse = await fetch(
+        import.meta.env.VITE_API_ENDPOINT +
+          "/users/" +
+          auth.UserID +
+          "/completed",
+        {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+          },
         }
-      })
-      .catch((error) => {
-        console.error("Error:", error);
-      });
+      );
 
-    setAuth({ ...auth, Completado: true });
-    //actualizar en el local storage
-    localStorage.setItem("auth", JSON.stringify({ ...auth, Completado: true }));
-    navigate("/inicio");
+      if (userResponse.ok) {
+        console.log("Usuario actualizado");
+      } else {
+        console.error("Error al actualizar el usuario");
+      }
+
+      console.log("Ejecutando webpages");
+      const webpageResponse = await fetch(
+        import.meta.env.VITE_API_ENDPOINT + "/webpages",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            WebPageID: uid(),
+            WeddingID,
+            URLPage: URL,
+            Styles: {
+              primaryColor: "#ff69a7",
+              secondaryColor: "#b6f679",
+              Typography: "Roboto",
+              FrontURL:
+                "https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100;0,300;0,400;0,500;0,700;0,900;1,100;1,300;1,400;1,500;1,700;1,900&display=swap",
+            },
+          }),
+        }
+      );
+
+      if (webpageResponse.ok) {
+        console.log("Web page creada");
+      } else {
+        console.error("Error al crear web page");
+      }
+
+      setAuth({ ...auth, Completado: true });
+      localStorage.setItem(
+        "auth",
+        JSON.stringify({ ...auth, Completado: true })
+      );
+      navigate("/inicio");
+    } catch (error) {
+      console.error("Error en el proceso:", error);
+    }
   }
 
   return (

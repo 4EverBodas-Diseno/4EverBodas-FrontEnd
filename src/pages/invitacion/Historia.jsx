@@ -3,7 +3,10 @@ import { Link } from "react-router-dom";
 
 const Historia = ({ description, colores }) => {
   return (
-    <section className=" flex gap-5 mx-auto items-center justify-between ">
+    <section
+      id="Historia"
+      className=" flex gap-5 mx-auto items-center justify-between "
+    >
       <div className="w-[450px]">
         <h2
           className="text-2xl font-extrabold"

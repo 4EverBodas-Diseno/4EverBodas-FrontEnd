@@ -1,12 +1,14 @@
 import React, { useState, useEffect, useCallback } from "react";
 import Table from "./Table";
 import { uid } from "uid";
+import PopUpAgregarInvitado from "../../../components/PopUpAgregarInvitado";
 
 const Principal = () => {
   const [active, setActive] = useState(false);
   const [guests, setGuests] = useState([]);
   const [count, setCount] = useState(0);
   const [selectedGuestIds, setSelectedGuestIds] = useState(new Set());
+  const [activeGuest, setActiveGuest] = useState(null);
 
   const handleSelect = useCallback((guestId) => {
     setSelectedGuestIds((prevSelectedGuestIds) => {
@@ -26,64 +28,97 @@ const Principal = () => {
     [selectedGuestIds]
   );
 
-  const [newGuest, setNewGuest] = useState({
-    nombres: "",
-    apellidos: "",
-    telefono: "",
-    maxAcompanantes: 0,
-    correo: "",
-  });
-
   const handleSeleccionarTodos = () => {
     guests.forEach((e) => {
       handleSelect(e.GuestID);
     });
   };
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    const auth = JSON.parse(localStorage.getItem("auth"));
-    const guestInfo = JSON.stringify({
-      GuestID: uid(),
-      UserID: auth.UserID,
-      Nombre: newGuest.nombres,
-      Apellido: newGuest.apellidos,
-      Correo: newGuest.correo,
-      EstadoInvitacion: "Por confirmar",
-      Confirmado: true,
-      numAcompanantes: 10,
-      numMaxAcompanantes: newGuest.maxAcompanantes,
-      Telefono: newGuest.telefono,
-      URL: "holamundo",
-    });
+
+  const onSave = (newGuest) => {
     //obtener el userID del localstorage
-    fetch(import.meta.env.VITE_API_ENDPOINT + "/guests", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: guestInfo,
-    })
-      .then((response) => {
-        if (response.ok) {
-          return response.json();
-        }
-        throw new Error("Error en la petición");
-      })
-      .then((data) => {
-        console.log(data);
-        setGuests([...guests, data.guest]);
-        console.log("Invitado agregado");
-        setNewGuest({
-          nombres: "",
-          apellidos: "",
-          telefono: "",
-          maxAcompanantes: 0,
-          correo: "",
-        });
-        setActive(false);
+    if (!activeGuest) {
+      const auth = JSON.parse(localStorage.getItem("auth"));
+      const guestInfo = JSON.stringify({
+        GuestID: uid(),
+        UserID: auth.UserID,
+        EstadoInvitacion: "Por confirmar",
+        Confirmado: false,
+        numAcompanantes: 0,
+        URL: "",
+        ...newGuest,
       });
+      fetch(import.meta.env.VITE_API_ENDPOINT + "/guests", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: guestInfo,
+      })
+        .then((response) => {
+          if (response.ok) {
+            return response.json();
+          }
+          throw new Error("Error en la petición");
+        })
+        .then((data) => {
+          console.log(data);
+          setGuests([...guests, data.guest]);
+          console.log("Invitado agregado");
+          setActive(false);
+        });
+    } else {
+      const guestInfo = JSON.stringify({
+        ...newGuest,
+      });
+      fetch(
+        `${import.meta.env.VITE_API_ENDPOINT}/guests/${activeGuest.GuestID}`,
+        {
+          method: "PATCH",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: guestInfo, // guestInfo es el objeto con los datos actualizados
+        }
+      )
+        .then((response) => {
+          if (response.ok) {
+            return response.json();
+          }
+          throw new Error("Error en la edición");
+        })
+        .then((data) => {
+          console.log("Invitado editado:", data);
+          // Actualizar la lista de invitados
+          setGuests((prevGuests) =>
+            prevGuests.map((guest) =>
+              guest.GuestID === activeGuest.GuestID ? { ...newGuest } : guest
+            )
+          );
+          alert("Invitado actualizado en la lista");
+          setActive(false); // Cerrar el popup
+        })
+        .catch((error) => {
+          console.error("Error al editar el invitado:", error);
+        });
+    }
   };
 
+  const handleEdit = () => {
+    const selectedId = Array.from(selectedGuestIds)[0]; // Obtiene el único ID seleccionado
+    const guestToEdit = guests.find((guest) => guest.GuestID === selectedId); // Busca al invitado
+
+    if (!guestToEdit) {
+      alert("No se encontró el invitado seleccionado.");
+      return;
+    }
+    setActiveGuest(guestToEdit);
+    setActive(true);
+  };
+
+  const handleNuevoInvitado = () => {
+    setActiveGuest(null);
+    setActive(true);
+  };
   const handleEliminar = () => {
     if (selectedGuestIds.size === 0) return alert("No ha seleccionado");
     const arreglo = Array.from(selectedGuestIds);
@@ -109,7 +144,9 @@ const Principal = () => {
       prevGuests.filter((guest) => !selectedGuestIds.has(guest.GuestID))
     );
     setSelectedGuestIds(new Set());
+    setCount(0);
   };
+
   useEffect(() => {
     //traer el auth desde el localstorage
     const auth = JSON.parse(localStorage.getItem("auth"));
@@ -143,7 +180,7 @@ const Principal = () => {
         <div className="flex items-center justify-between space-x-4">
           <section className="flex gap-4">
             <button
-              onClick={() => setActive(true)}
+              onClick={handleNuevoInvitado}
               className="bg-pink-500 text-white px-4 py-2 rounded-full font-semibold hover:bg-pink-600"
             >
               Agregar invitado
@@ -156,8 +193,13 @@ const Principal = () => {
             </button>
 
             <button
-              className="text-yellow-500 font-semibold hover:underline"
+              className={`font-semibold ${
+                count > 1
+                  ? "text-gray-400 cursor-not-allowed"
+                  : "text-yellow-500 hover:underline"
+              }`}
               disabled={count > 1}
+              onClick={handleEdit}
             >
               Editar
             </button>
@@ -167,122 +209,6 @@ const Principal = () => {
             
           </select> */}
         </div>
-        {active && (
-          //form to add a new guest
-          <form className="flex relative flex-col gap-4 justify-center w-[500px] mx-auto m-4 bg-gray-50 p-5">
-            <button
-              onClick={() => setActive(false)}
-              className="text-white px-4 py-2 bg-red-500 rounded-lg w-20 self-end"
-            >
-              Cerrar
-            </button>
-            <div>
-              <label
-                htmlFor="nombres"
-                className="block text-gray-700 font-semibold mb-1"
-              >
-                Nombres:
-              </label>
-              <input
-                type="text"
-                id="Nombre"
-                name="Nombre"
-                value={newGuest.nombres}
-                onChange={(e) =>
-                  setNewGuest({ ...newGuest, nombres: e.target.value })
-                }
-                required
-                className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-gray-300"
-              />
-            </div>
-            <div>
-              <label
-                htmlFor="apellidos"
-                className="block text-gray-700 font-semibold mb-1"
-              >
-                Apellidos:
-              </label>
-              <input
-                type="text"
-                id="Apellidos"
-                name="Apellidos"
-                value={newGuest.apellidos}
-                onChange={(e) =>
-                  setNewGuest({ ...newGuest, apellidos: e.target.value })
-                }
-                required
-                className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-gray-300"
-              />
-            </div>
-            <div>
-              <label
-                htmlFor="telefono"
-                className="block text-gray-700 font-semibold mb-1"
-              >
-                Número de Teléfono:
-              </label>
-              <input
-                type="tel"
-                id="telefono"
-                name="telefono"
-                required
-                value={newGuest.telefono}
-                onChange={(e) =>
-                  setNewGuest({ ...newGuest, telefono: e.target.value })
-                }
-                className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-gray-300"
-              />
-            </div>
-            <div>
-              <label
-                htmlFor="correo"
-                className="block text-gray-700 font-semibold mb-1"
-              >
-                Correo
-              </label>
-              <input
-                type="email"
-                id="correo"
-                name="coreo"
-                required
-                value={newGuest.correo}
-                onChange={(e) =>
-                  setNewGuest({ ...newGuest, correo: e.target.value })
-                }
-                className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-gray-300"
-              />
-            </div>
-            <div>
-              <label
-                htmlFor="maxAcompanantes"
-                className="block text-gray-700 font-semibold mb-1"
-              >
-                Número Máximo de Acompañantes:
-              </label>
-              <input
-                type="number"
-                id="maxAcompanantes"
-                name="maxAcompanantes"
-                required
-                value={newGuest.maxAcompanantes}
-                onChange={(e) =>
-                  setNewGuest({
-                    ...newGuest,
-                    maxAcompanantes: e.target.value,
-                  })
-                }
-                className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-gray-300"
-              />
-            </div>
-            <button
-              type="submit"
-              onClick={handleSubmit}
-              className="bg-blue-500 text-white px-4 py-2 rounded-full font-semibold hover:bg-blue-600"
-            >
-              Agregar Invitado
-            </button>
-          </form>
-        )}
         {/* Sección derecha */}
         <div className="flex items-center space-x-4 justify-between">
           <div className="flex items-center">
@@ -301,11 +227,20 @@ const Principal = () => {
         </div>
       </div>
 
-      {guests && (
+      {guests?.length !== 0 || guests ? (
         <Table
           guests={guests}
           isGuestSelected={isGuestSelected}
           handleSelect={handleSelect}
+        />
+      ) : (
+        "No hay invitados"
+      )}
+      {active && (
+        <PopUpAgregarInvitado
+          onClose={() => setActive(false)}
+          onSave={onSave}
+          initialData={activeGuest}
         />
       )}
       {/* <div className="w-full flex justify-between mt-4 py-3 px-6 border-[1px] border-slate-200 rounded-xl">

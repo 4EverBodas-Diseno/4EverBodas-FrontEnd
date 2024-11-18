@@ -79,7 +79,8 @@ const Principal = () => {
             />
           </div>
           <span className="text-gray-500 ml-2">
-            Su URL: invitaciones.4everbodas.com/<strong>Ale-y-Uziel</strong>
+            Su URL: {import.meta.env.VITE_URL_FRONTEND}/invitacion/
+            {JSON.parse(localStorage.getItem("auth")).UserID}
           </span>
         </div>
         <div className="mb-6">

@@ -41,13 +41,17 @@ const Principal = () => {
           profileID: data.profileID,
           telefono: data.Telefono || "",
           direccion: data.Direccion || "",
-          fechaNacimiento: data.FechaNacimiento || "",
+          fechaNacimiento: convertirFecha(data.FechaNacimiento) || "",
         });
       })
       .catch((error) => {
         console.error("Error:", error);
       });
   }, []);
+  const convertirFecha = (fechaISO) => {
+    return new Date(fechaISO).toISOString().split("T")[0];
+  };
+
   return (
     <>
       <h2 className="text-3xl font-bold mb-4 text-secondary-200">

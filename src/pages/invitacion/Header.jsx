@@ -8,7 +8,7 @@ const Header = ({ pareja }) => {
         <nav>
           <ul className="flex space-x-4">
             <li>
-              <a href="#" className="hover:underline">
+              <a href="#Historia" className="hover:underline">
                 Historia
               </a>
             </li>
@@ -26,12 +26,12 @@ const Header = ({ pareja }) => {
         <nav>
           <ul className="flex space-x-4 justify-end">
             <li>
-              <a href="#" className="hover:underline">
+              <a href="#Fecha" className="hover:underline">
                 Fecha
               </a>
             </li>
             <li>
-              <a href="#" className="hover:underline">
+              <a href="#Lugar" className="hover:underline">
                 Lugar
               </a>
             </li>
