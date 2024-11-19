@@ -61,7 +61,7 @@ const ContentTable = memo(({ guest, isSelected, onSelect }) => {
       </td>
       <td className="px-4 py-2">
         <a
-          className="border border-green-500 text-green-500 px-4 py-2 rounded-full font-semibold hover:bg-green-100 text-xs"
+          className="button-enviar-por-whatsapp border border-green-500 text-green-500 px-4 py-2 rounded-full font-semibold hover:bg-green-100 text-xs"
           target="_blank"
           href={generarMensajeWhatsApp(guest)}
         >

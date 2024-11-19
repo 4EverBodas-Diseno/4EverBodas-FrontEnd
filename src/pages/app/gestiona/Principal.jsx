@@ -61,9 +61,7 @@ const Principal = () => {
           throw new Error("Error en la petición");
         })
         .then((data) => {
-          console.log(data);
           setGuests([...guests, data.guest]);
-          console.log("Invitado agregado");
           setActive(false);
         });
     } else {
@@ -87,7 +85,6 @@ const Principal = () => {
           throw new Error("Error en la edición");
         })
         .then((data) => {
-          console.log("Invitado editado:", data);
           // Actualizar la lista de invitados
           setGuests((prevGuests) =>
             prevGuests.map((guest) =>

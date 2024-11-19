@@ -44,7 +44,6 @@ const Principal = () => {
     })
       .then((res) => res.json())
       .then((data) => {
-        console.log(data);
         alert("Se ha guardado correctamente");
       })
       .catch((error) => {

@@ -110,7 +110,6 @@ const RealTime = ({ data, setData }) => {
     // Carga la primera tipografía
     handleFontChange(data.tipografia);
     handleColorChange(data.color);
-    console.log(data);
   }, []);
 
   const submit = () => {
@@ -133,7 +132,6 @@ const RealTime = ({ data, setData }) => {
         return response.json();
       })
       .then((data) => {
-        console.log(data);
         alert("Se ha guardado correctamente");
       });
   };
